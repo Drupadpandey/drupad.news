@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Location Based News App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .search-box {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input {
+      padding: 10px;
+      width: 250px;
+    }
+
+    button {
+      padding: 10px 15px;
+      cursor: pointer;
+    }
+
+    .news-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 15px;
+    }
+
+    .news-card {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .news-card h3 {
+      font-size: 18px;
+    }
+
+    .news-card a {
+      color: blue;
+      font-weight: bold;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+<h1>📰 Location Based News</h1>
+
+<div class="search-box">
+  <input type="text" id="location" placeholder="Enter location (India, USA, Delhi)">
+  <button onclick="getNews()">Get News</button>
+</div>
+
+<div id="news" class="news-container"></div>
+
+<script>
+const API_KEY = "pub_2bd7bf36914d420bbf8bb9080608f29e";
+
+async function getNews() {
+  const location = document.getElementById("location").value;
+  const newsDiv = document.getElementById("news");
+
+  if (!location) {
+    alert("Enter a location");
+    return;
+  }
+
+  newsDiv.innerHTML = "Loading news...";
+
+  try {
+    const url = `https://newsdata.io/api/1/news?apikey=${API_KEY}&q=${location}&language=en`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    newsDiv.innerHTML = "";
+
+    if (!data.results || data.results.length === 0) {
+      newsDiv.innerHTML = "No news found.";
+      return;
+    }
+
+    data.results.forEach(article => {
+      const card = document.createElement("div");
+      card.className = "news-card";
+
+      card.innerHTML = `
+        <h3>${article.title}</h3>
+        <p>${article.description || "No description available"}</p>
+        <a href="${article.link}" target="_blank">Read more</a>
+      `;
+
+      newsDiv.appendChild(card);
+    });
+
+  } catch (err) {
+    newsDiv.innerHTML = "Error loading news.";
+  }
+}
+</script>
+
+</body>
+</html>
